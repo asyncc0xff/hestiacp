@@ -20,7 +20,7 @@ hero:
       link: https://demo.hestiacp.com:8083/
     - theme: alt
       text: View on GitHub
-      link: https://github.com/hestiacp/hestiacp
+      link: https://github.com/asyncc0xff/hestiacp
 
 features:
   - icon: 🚀

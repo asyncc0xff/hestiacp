@@ -128,4 +128,21 @@ $BIN/v-rebuild-web-domains "$user" "$restart"
 $BIN/v-log-action "$user" "Info" "Web" "Renamed web domain (Old Domain: $domain, New Domain: $new_domain)."
 log_event "$OK" "$EVENT"
 
+# Auto-reissue Let's Encrypt SSL certificate if it exists
+if [ "$SSL" = 'yes' ] && [ "$LETSENCRYPT" = 'yes' ]; then
+    echo "Reissuing Let's Encrypt certificate for $new_domain..."
+    $BIN/v-delete-letsencrypt-domain $user $new_domain 'no' 2>/dev/null
+    sleep 5
+    $BIN/v-add-letsencrypt-domain $user $new_domain '' 'yes'
+    if [ $? -eq 0 ]; then
+        # Re-enable HTTPS redirect if it was enabled
+        if [ "$SSL_FORCE" = 'yes' ]; then
+            $BIN/v-add-web-domain-ssl-force $user $new_domain
+        fi
+        echo "SSL certificate successfully reissued for $new_domain"
+    else
+        echo "Warning: Failed to reissue SSL certificate for $new_domain"
+    fi
+fi
+
 exit

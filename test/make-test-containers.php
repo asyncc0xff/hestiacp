@@ -14,7 +14,7 @@
 # CONFIG HOST STEPS:
 #   export SHARED_HOST_FOLDER="/home/myuser/projectfiles"
 #   mkdir -p $SHARED_HOST_FOLDER
-#   cd $SHARED_HOST_FOLDER && git clone https://github.com/hestiacp/hestiacp.git && cd hestiacp && git checkout ..branch..
+#   cd $SHARED_HOST_FOLDER && git clone https://github.com/asyncc0xff/hestiacp.git && cd hestiacp && git checkout ..branch..
 #
 
 /*
@@ -259,7 +259,7 @@ function getHestiaVersion($branch) {
 		$control_file = file_get_contents(SHARED_HOST_FOLDER . "/hestiacp/src/deb/hestia/control");
 	} else {
 		$control_file = file_get_contents(
-			"https://raw.githubusercontent.com/hestiacp/hestiacp/${branch}/src/deb/hestia/control",
+			        "https://raw.githubusercontent.com/asyncc0xff/hestiacp/${branch}/src/deb/hestia/control",
 		);
 	}
 

@@ -70,6 +70,10 @@ if (!empty($_POST["ok"])) {
 
 	// Add web domain
 	if (empty($_SESSION["error_msg"])) {
+		// Set AUTO_SSL environment variable
+		$auto_ssl = (!empty($_POST['auto_ssl'])) ? 'yes' : 'no';
+		putenv("AUTO_SSL=" . $auto_ssl);
+		
 		exec(
 			HESTIA_CMD .
 				"v-add-web-domain " .

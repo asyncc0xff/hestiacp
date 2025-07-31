@@ -67,7 +67,7 @@
 				<?php } ?>
 				<?php if (isset($_SESSION["IMAP_SYSTEM"]) && !empty($_SESSION["IMAP_SYSTEM"])) { ?>
 					<?php if ($panel[$user_plain]["MAIL_DOMAINS"] != "0") { ?>
-						<div class="form-check">
+						<div class="form-check u-mb10">
 							<input class="form-check-input" type="checkbox" name="v_mail" id="v_mail" <?php if (empty($v_mail) && $panel[$user_plain]["MAIL_DOMAINS"] != "0"); ?>>
 							<label for="v_mail">
 								<?= _("Mail Support") ?>
@@ -75,6 +75,12 @@
 						</div>
 					<?php } ?>
 				<?php } ?>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" name="auto_ssl" id="auto_ssl" checked>
+					<label for="auto_ssl">
+						<?= _("Auto-generate Let's Encrypt SSL certificate") ?>
+					</label>
+				</div>
 			<?php } ?>
 		</div>
 

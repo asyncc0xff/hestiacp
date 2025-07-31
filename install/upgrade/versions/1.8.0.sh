@@ -131,17 +131,17 @@ if [ "$WEB_SYSTEM" = "nginx" ] || [ "$PROXY_SYSTEM" = "nginx" ]; then
 		sed 's|https://www.cloudflare.com/||;/^[ \t]\+resolver .\+;$/d;/^[ \t]\+# Cache settings$/d;/^[ \t]\+# Proxy cache$/d' /etc/nginx/nginx.conf | sed ':l;N;$!bl;s/[ \n\t]*//g' > "$nginx_conf_local"
 
 		# For installations before v1.6.8 (from commit 9b544be to commit b2ad154)
-		curl -fsLm5 --retry 2 https://raw.githubusercontent.com/hestiacp/hestiacp/b2ad1549a21655837056e4b7883970d51a4b324f/install/deb/nginx/nginx.conf \
+		curl -fsLm5 --retry 2 https://raw.githubusercontent.com/asyncc0xff/hestiacp/b2ad1549a21655837056e4b7883970d51a4b324f/install/deb/nginx/nginx.conf \
 			| sed 's/fastcgi_buffers                 4 256k;/fastcgi_buffers                 8 256k;/g;s|/var/run/|/run/|g;/set_real_ip_from/d;/real_ip_header/d;s|# Cloudflare https://www.cloudflare.com/ips|# Cloudflare https://www.cloudflare.com/ips\n    include /etc/nginx/conf.d/cloudflare.inc;|g' \
 			| sed 's|https://www.cloudflare.com/||;/^[ \t]\+resolver .\+;$/d;/^[ \t]\+# Cache settings$/d;/^[ \t]\+# Proxy cache$/d' | sed ':l;N;$!bl;s/[ \n\t]*//g' > "$nginx_conf_commit"-b2ad154
 
 		# For installations after v1.6.8 but before v1.7.0 (from commit b2ad154 to commit 015b20a)
-		curl -fsLm5 --retry 2 https://raw.githubusercontent.com/hestiacp/hestiacp/015b20ae1ffb82faaf58b41a5dc9ad1b078b785f/install/deb/nginx/nginx.conf \
+		curl -fsLm5 --retry 2 https://raw.githubusercontent.com/asyncc0xff/hestiacp/015b20ae1ffb82faaf58b41a5dc9ad1b078b785f/install/deb/nginx/nginx.conf \
 			| sed 's|/var/run/|/run/|g;/set_real_ip_from/d;/real_ip_header/d;s|# Cloudflare https://www.cloudflare.com/ips|# Cloudflare https://www.cloudflare.com/ips\n    include /etc/nginx/conf.d/cloudflare.inc;|g' \
 			| sed 's|https://www.cloudflare.com/||;/^[ \t]\+resolver .\+;$/d;/^[ \t]\+# Cache settings$/d;/^[ \t]\+# Proxy cache$/d' | sed ':l;N;$!bl;s/[ \n\t]*//g' > "$nginx_conf_commit"-015b20a
 
 		# For installations after v1.7.0 (commit 555f892)
-		curl -fsLm5 --retry 2 https://raw.githubusercontent.com/hestiacp/hestiacp/555f89243e54e02458586ae4f7999458cc9d33e9/install/deb/nginx/nginx.conf \
+		curl -fsLm5 --retry 2 https://raw.githubusercontent.com/asyncc0xff/hestiacp/555f89243e54e02458586ae4f7999458cc9d33e9/install/deb/nginx/nginx.conf \
 			| sed 's|https://www.cloudflare.com/||;/^[ \t]\+resolver .\+;$/d;/^[ \t]\+# Cache settings$/d;/^[ \t]\+# Proxy cache$/d' | sed ':l;N;$!bl;s/[ \n\t]*//g' > "$nginx_conf_commit"-555f892
 
 		for commit in b2ad154 015b20a 555f892; do
@@ -154,8 +154,8 @@ if [ "$WEB_SYSTEM" = "nginx" ] || [ "$PROXY_SYSTEM" = "nginx" ]; then
 
 		if [ "$nginx_conf_compare" != "same" ]; then
 			echo -e "[ ! ] Manual action required, please view:\n[ - ] $HESTIA_BACKUP/message.log"
-			add_upgrade_message "Manual Action Required [IMPORTANT]\n\nTo enable the \"Enhanced and Optimized TLS\" feature, we must update the NGINX configuration file (/etc/nginx/nginx.conf).\n\nBut for unknown reason or you edited it, may not be fully apply all the changes in this upgrade.\n\nPlease follow the default configuration file to sync it:\n$HESTIA_INSTALL_DIR/nginx/nginx.conf\n\nBacked up configuration file:\n$HESTIA_BACKUP/conf/nginx/nginx.conf\n\nLearn more:\nhttps://github.com/hestiacp/hestiacp/pull/3555\n\n"
-			"$BIN"/v-add-user-notification admin "IMPORTANT: Manual Action Required" '<p>To enable the "Enhanced and Optimized TLS" feature, we must update the NGINX configuration file at <code>/etc/nginx/nginx.conf</code>.</p><p>But for unknown reason or you edited it, may not be fully apply all the changes in this upgrade.</p><p>Please follow the default configuration file to sync it:<br><code>'"$HESTIA_INSTALL_DIR"'/nginx/nginx.conf</code></p><p>Backed up configuration file:<br><code>'"$HESTIA_BACKUP"'/conf/nginx/nginx.conf</code></p><p>Visit PR <a href="https://github.com/hestiacp/hestiacp/pull/3555" target="_blank">#3555</a> on GitHub to learn more.</p>'
+			add_upgrade_message "Manual Action Required [IMPORTANT]\n\nTo enable the \"Enhanced and Optimized TLS\" feature, we must update the NGINX configuration file (/etc/nginx/nginx.conf).\n\nBut for unknown reason or you edited it, may not be fully apply all the changes in this upgrade.\n\nPlease follow the default configuration file to sync it:\n$HESTIA_INSTALL_DIR/nginx/nginx.conf\n\nBacked up configuration file:\n$HESTIA_BACKUP/conf/nginx/nginx.conf\n\nLearn more:\nhttps://github.com/asyncc0xff/hestiacp/pull/3555\n\n"
+			"$BIN"/v-add-user-notification admin "IMPORTANT: Manual Action Required" '<p>To enable the "Enhanced and Optimized TLS" feature, we must update the NGINX configuration file at <code>/etc/nginx/nginx.conf</code>.</p><p>But for unknown reason or you edited it, may not be fully apply all the changes in this upgrade.</p><p>Please follow the default configuration file to sync it:<br><code>'"$HESTIA_INSTALL_DIR"'/nginx/nginx.conf</code></p><p>Backed up configuration file:<br><code>'"$HESTIA_BACKUP"'/conf/nginx/nginx.conf</code></p><p>Visit PR <a href="https://github.com/asyncc0xff/hestiacp/pull/3555" target="_blank">#3555</a> on GitHub to learn more.</p>'
 
 			sed -i "s/""$(grep -m 1 "IMPORTANT: Manual Action Required" "$HESTIA"/data/users/admin/notifications.conf | awk '{print $1}')""/NID='1'/" "$HESTIA"/data/users/admin/notifications.conf
 
@@ -186,8 +186,8 @@ if [ "$WEB_SYSTEM" = "nginx" ] || [ "$PROXY_SYSTEM" = "nginx" ]; then
 
 		# Implement TLS 1.3 0-RTT anti-replay
 		echo -e "[ * ] TLS 1.3 0-RTT anti-replay for NGINX, please view:\n[ - ] $HESTIA_BACKUP/message.log"
-		add_upgrade_message "About TLS 1.3 0-RTT anti-replay for NGINX\n\nIf you use custom templates, please update them (*.stpl) to apply this protection.\n\nFollow the usage or other default templates:\n/etc/nginx/conf.d/0rtt-anti-replay.conf\n\nLearn more:\nhttps://github.com/hestiacp/hestiacp/pull/3692"
-		"$BIN"/v-add-user-notification admin "About TLS 1.3 0-RTT anti-replay for NGINX" '<p>If you use custom templates, please update them (*.stpl) to apply this protection.</p><p>Follow the usage or other default templates:<br><code>/etc/nginx/conf.d/0rtt-anti-replay.conf</code></p><p>Visit PR <a href="https://github.com/hestiacp/hestiacp/pull/3692" target="_blank">#3692</a> on GitHub to learn more.</p>'
+		add_upgrade_message "About TLS 1.3 0-RTT anti-replay for NGINX\n\nIf you use custom templates, please update them (*.stpl) to apply this protection.\n\nFollow the usage or other default templates:\n/etc/nginx/conf.d/0rtt-anti-replay.conf\n\nLearn more:\nhttps://github.com/asyncc0xff/hestiacp/pull/3692"
+		"$BIN"/v-add-user-notification admin "About TLS 1.3 0-RTT anti-replay for NGINX" '<p>If you use custom templates, please update them (*.stpl) to apply this protection.</p><p>Follow the usage or other default templates:<br><code>/etc/nginx/conf.d/0rtt-anti-replay.conf</code></p><p>Visit PR <a href="https://github.com/asyncc0xff/hestiacp/pull/3692" target="_blank">#3692</a> on GitHub to learn more.</p>'
 
 		if grep -qw "IMPORTANT: Manual Action Required" "$HESTIA"/data/users/admin/notifications.conf 2> /dev/null; then
 			sed -i "s/""$(grep -m 1 "About TLS 1.3 0-RTT anti-replay for NGINX" "$HESTIA"/data/users/admin/notifications.conf | awk '{print $1}')""/NID='2'/" "$HESTIA"/data/users/admin/notifications.conf

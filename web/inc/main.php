@@ -1,4 +1,16 @@
 <?php
+ini_set('session.gc_maxlifetime', 86400);
+ini_set('session.cookie_lifetime', 86400);
+ini_set('session.cache_expire', 1440);
+
+session_set_cookie_params([
+    'lifetime' => 86400,
+    'path' => '/',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Strict'
+]);
+
 session_start();
 
 use PHPMailer\PHPMailer\PHPMailer;

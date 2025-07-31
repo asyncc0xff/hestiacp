@@ -50,8 +50,8 @@
 			<?php show_alert_message($_SESSION); ?>
 			<div class="u-mb10">
 				<label for="v_domain" class="form-label"><?= _("Domain") ?></label>
-				<input type="text" class="form-control" name="v_domain" id="v_domain" value="<?= htmlentities(trim($v_domain, "'")) ?>" disabled required>
-				<input type="hidden" name="v_domain" value="<?= htmlentities(trim($v_domain, "'")) ?>">
+				<input type="text" class="form-control" name="v_domain" id="v_domain" value="<?= htmlentities(trim($v_domain, "'")) ?>" required>
+				<input type="hidden" name="original_domain" value="<?= htmlentities(trim($v_domain, "'")) ?>">
 			</div>
 			<div class="u-mb10">
 				<label for="v_aliases" class="form-label"><?= _("Aliases") ?></label>
