@@ -118,6 +118,11 @@
 				</select>
 			</div>
 			<div class="u-mb10">
+				<label for="v_file_manager_root" class="form-label"><?= _("File Manager Root Directory") ?></label>
+				<input type="text" class="form-control" name="v_file_manager_root" id="v_file_manager_root" value="<?= htmlentities(trim($v_file_manager_root, "'")) ?>" placeholder="<?= _("Default") ?>: /home/{username}">
+				<small class="form-text"><?= _("Leave empty to use default directory. Must be within /home directory.") ?></small>
+			</div>
+			<div class="u-mb10">
 				<label for="v_notify" class="form-label">
 					<?= _("Email login credentials to:") ?>
 				</label>

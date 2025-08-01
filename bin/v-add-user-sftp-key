@@ -60,12 +60,33 @@ if [ ! -f "${AUTHKEY_FILE}" ] || [ "$new_privkey" = true ]; then
 	# make sure authorized_keys is ending with EOL
 	[ -f "${AUTHKEY_FILE}" ] && sed -i '$a\' "${AUTHKEY_FILE}"
 
+	user_conf_file="$HESTIA/data/users/$user/user.conf"
+	file_manager_root=""
+	
+	if [ -f "$user_conf_file" ]; then
+		source "$user_conf_file"
+		if [ -n "$FILE_MANAGER_ROOT" ]; then
+			file_manager_root="$FILE_MANAGER_ROOT"
+		fi
+	fi
+	
+	if [ -n "$file_manager_root" ] && [ "$file_manager_root" != "/home/$user" ]; then
+		relative_path="${file_manager_root#/home/$user/}"
+		if [ "$relative_path" = "$file_manager_root" ]; then
+			sftp_command="internal-sftp -d /"
+		else
+			sftp_command="internal-sftp -d /$relative_path"
+		fi
+	else
+		sftp_command="internal-sftp -d /home/$user"
+	fi
+	
 	expire=0
 	if [[ "$ttl" -gt 0 ]]; then
 		expire=$(date +%s -d "+${ttl} min")
 		echo "rm ${PRVKEY_FILE}" | at "now +${ttl} minute" > /dev/null 2>&1
 	fi
-	echo "from=\"127.0.0.1\",command=\"internal-sftp\",restrict ${pubkey_str} TS:${expire} ${pubkey_desc}" >> "${AUTHKEY_FILE}"
+	echo "from=\"127.0.0.1\",command=\"$sftp_command\",restrict ${pubkey_str} TS:${expire} ${pubkey_desc}" >> "${AUTHKEY_FILE}"
 fi
 
 #

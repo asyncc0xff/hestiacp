@@ -1,10 +1,10 @@
 <?php
-ini_set('session.gc_maxlifetime', 86400);
-ini_set('session.cookie_lifetime', 86400);
-ini_set('session.cache_expire', 1440);
+ini_set('session.gc_maxlifetime', 31536000);
+ini_set('session.cookie_lifetime', 31536000);
+ini_set('session.cache_expire', 525600);
 
 session_set_cookie_params([
-    'lifetime' => 86400,
+    'lifetime' => 31536000,
     'path' => '/',
     'secure' => true,
     'httponly' => true,

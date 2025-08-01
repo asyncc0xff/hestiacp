@@ -62,6 +62,7 @@ $v_role = $data[$v_username]["ROLE"];
 $v_login_disabled = $data[$v_username]["LOGIN_DISABLED"];
 $v_login_use_iplist = $data[$v_username]["LOGIN_USE_IPLIST"];
 $v_login_allowed_ips = $data[$v_username]["LOGIN_ALLOW_IPS"];
+$v_file_manager_root = $data[$v_username]["FILE_MANAGER_ROOT"] ?? "";
 $v_ns = $data[$v_username]["NS"];
 $nameservers = explode(",", $v_ns);
 if (empty($nameservers[0])) {
@@ -438,6 +439,35 @@ if (!empty($_POST["save"])) {
 			check_return_code($return_var, $output);
 			unset($output);
 			$v_name = $_POST["v_name"];
+		}
+	}
+
+	if (isset($_POST["v_file_manager_root"]) && $_POST["v_file_manager_root"] != $v_file_manager_root) {
+		$new_root = trim($_POST["v_file_manager_root"]);
+		
+		if (empty($new_root)) {
+			exec(
+				HESTIA_CMD . "v-change-user-config-value " . quoteshellarg($v_username) . " FILE_MANAGER_ROOT ''",
+				$output,
+				$return_var,
+			);
+			check_return_code($return_var, $output);
+			unset($output);
+			$v_file_manager_root = "";
+		} else {
+			if (strpos($new_root, '/home/') !== 0) {
+				$_SESSION["error_msg"] = _("File manager root path must be within /home directory.");
+			} else {
+				$new_root = quoteshellarg($new_root);
+				exec(
+					HESTIA_CMD . "v-change-user-file-manager-root " . quoteshellarg($v_username) . " " . $new_root,
+					$output,
+					$return_var,
+				);
+				check_return_code($return_var, $output);
+				unset($output);
+				$v_file_manager_root = $_POST["v_file_manager_root"];
+			}
 		}
 	}
 

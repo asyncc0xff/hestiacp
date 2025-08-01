@@ -200,6 +200,11 @@
 						?>
 					</select>
 				</div>
+				<div class="u-mb10">
+					<label for="v_file_manager_root" class="form-label"><?= _("File Manager Root Directory") ?></label>
+					<input type="text" class="form-control" name="v_file_manager_root" id="v_file_manager_root" value="<?= htmlentities(trim($v_file_manager_root, "'")) ?>" placeholder="<?= _("Default") ?>: /home/<?= htmlentities(trim($v_username, "'")) ?>">
+					<small class="form-text"><?= _("Leave empty to use default directory. Must be within /home directory.") ?></small>
+				</div>
 				<div class="u-mb20">
 					<button x-on:click="showAdvanced = !showAdvanced" type="button" class="button button-secondary">
 						<?= _("Advanced Options") ?>

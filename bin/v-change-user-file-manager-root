@@ -1,0 +1,74 @@
+#!/bin/bash
+# info: change user file manager root directory
+# options: USER ROOT_PATH
+#
+# example: v-change-user-file-manager-root user /home/user/web
+#
+# This function changes the root directory for the file manager for a specific user.
+
+#----------------------------------------------------------#
+#                Variables & Functions                     #
+#----------------------------------------------------------#
+
+# Argument definition
+user=$1
+root_path=$2
+
+# Includes
+# shellcheck source=/etc/hestiacp/hestia.conf
+source /etc/hestiacp/hestia.conf
+# shellcheck source=/usr/local/hestia/func/main.sh
+source $HESTIA/func/main.sh
+# load config file
+source_conf "$HESTIA/conf/hestia.conf"
+
+#----------------------------------------------------------#
+#                    Verifications                         #
+#----------------------------------------------------------#
+
+check_args '2' "$#" 'USER ROOT_PATH'
+is_format_valid 'user'
+is_object_valid 'user' 'USER' "$user"
+
+# Perform verification if read-only mode is enabled
+check_hestia_demo_mode
+
+#----------------------------------------------------------#
+#                       Action                             #
+#----------------------------------------------------------#
+
+# Проверяем, что путь безопасный
+if [[ "$root_path" != "/home/$user"* ]] && [[ "$root_path" != "/home" ]]; then
+	check_result "$E_FORBIDEN" "Invalid file manager root path. Must be within /home directory."
+fi
+
+# Проверяем, что директория существует
+if [ ! -d "$root_path" ]; then
+	check_result "$E_NOTEXIST" "Directory $root_path does not exist."
+fi
+
+# Проверяем права доступа пользователя к директории
+if [ ! -r "$root_path" ] || [ ! -x "$root_path" ]; then
+	check_result "$E_FORBIDEN" "User $user does not have access to directory $root_path."
+fi
+
+# Читаем текущую конфигурацию пользователя
+source $USER_DATA/user.conf
+
+# Обновляем конфигурацию
+if [ -z "$FILE_MANAGER_ROOT" ]; then
+	# Добавляем новую переменную
+	echo "FILE_MANAGER_ROOT='$root_path'" >> $USER_DATA/user.conf
+else
+	# Обновляем существующую переменную
+	sed -i "s|FILE_MANAGER_ROOT='.*'|FILE_MANAGER_ROOT='$root_path'|g" $USER_DATA/user.conf
+fi
+
+#----------------------------------------------------------#
+#                       Hestia                             #
+#----------------------------------------------------------#
+
+# Logging
+log_event "$OK" "$ARGUMENTS"
+
+exit 

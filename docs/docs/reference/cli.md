@@ -7671,3 +7671,36 @@ update white label logo's
 **Options**: `[DOWNLOAD]`
 
 Replace Hestia logos with User created logo's
+
+## v-change-user-file-manager-root
+
+[Source](https://github.com/asyncc0xff/hestiacp/blob/release/bin/v-change-user-file-manager-root)
+
+change user file manager root directory
+
+**Options**: `USER` `ROOT_PATH`
+
+**Examples**:
+
+```bash
+v-change-user-file-manager-root user /home/user/web
+v-change-user-file-manager-root admin /home
+```
+
+This function changes the root directory for the file manager for a specific user. The root path must be within the /home directory for security reasons.
+
+## v-change-user-package
+
+[Source](https://github.com/asyncc0xff/hestiacp/blob/release/bin/v-change-user-package)
+
+change user package
+
+**Options**: `USER` `PACKAGE` `[FORCE]`
+
+**Examples**:
+
+```bash
+v-change-user-package admin yourpackage
+```
+
+This function changes user's hosting package.

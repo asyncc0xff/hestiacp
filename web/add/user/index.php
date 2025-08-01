@@ -133,6 +133,28 @@ if (!empty($_POST["ok"])) {
 		}
 	}
 
+	if (empty($_SESSION["error_msg"]) && !empty($_POST["v_file_manager_root"])) {
+		$file_manager_root = trim($_POST["v_file_manager_root"]);
+		
+		if (strpos($file_manager_root, '/home/') !== 0) {
+			$_SESSION["error_msg"] = _("File manager root path must be within /home directory.");
+		} else {
+			$file_manager_root = str_replace('{username}', $_POST["v_username"], $file_manager_root);
+			
+			exec(
+				HESTIA_CMD .
+					"v-change-user-file-manager-root " .
+					$v_username .
+					" " .
+					quoteshellarg($file_manager_root),
+				$output,
+				$return_var,
+			);
+			check_return_code($return_var, $output);
+			unset($output);
+		}
+	}
+
 	// Send email to the new user
 	if (empty($_SESSION["error_msg"]) && !empty($v_notify)) {
 		$to = $_POST["v_notify"];
@@ -276,6 +298,9 @@ if (empty($v_role)) {
 }
 if (empty($v_notify)) {
 	$v_notify = "";
+}
+if (empty($v_file_manager_root)) {
+	$v_file_manager_root = "";
 }
 // Render page
 render_page($user, $TAB, "add_user");

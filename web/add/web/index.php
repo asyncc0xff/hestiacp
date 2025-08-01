@@ -70,22 +70,31 @@ if (!empty($_POST["ok"])) {
 
 	// Add web domain
 	if (empty($_SESSION["error_msg"])) {
-		// Set AUTO_SSL environment variable
 		$auto_ssl = (!empty($_POST['auto_ssl'])) ? 'yes' : 'no';
+		
+		// Логируем для отладки
+		error_log("AUTO_SSL setting: " . $auto_ssl . " for domain: " . $v_domain);
+		
+		// Экспортируем переменную окружения
 		putenv("AUTO_SSL=" . $auto_ssl);
 		
 		exec(
-			HESTIA_CMD .
+			"export AUTO_SSL=" . escapeshellarg($auto_ssl) . " && " . HESTIA_CMD .
 				"v-add-web-domain " .
 				$user .
 				" " .
 				quoteshellarg($v_domain) .
 				" " .
 				$v_ip .
-				" 'yes'",
+				" 'yes' '' '' " .
+				escapeshellarg($auto_ssl), // Передаем как дополнительный параметр
 			$output,
 			$return_var,
 		);
+		
+		// Логируем результат
+		error_log("v-add-web-domain result: " . $return_var . ", output: " . implode("\n", $output));
+		
 		check_return_code($return_var, $output);
 		unset($output);
 		$domain_added = empty($_SESSION["error_msg"]);
@@ -135,6 +144,8 @@ if (!empty($_POST["ok"])) {
 		);
 		unset($v_domain);
 		unset($v_aliases);
+		header("Location: /list/web/");
+		exit();
 	}
 }
 // Define user variables

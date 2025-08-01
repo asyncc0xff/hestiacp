@@ -23,6 +23,7 @@ ip=$3
 restart=$4 # will be moved to the end soon
 aliases=$5
 proxy_ext=$6
+auto_ssl=$7  # Добавляем поддержку auto_ssl параметра
 
 # Includes
 # shellcheck source=/etc/hestiacp/hestia.conf
@@ -258,15 +259,24 @@ check_result $? "Proxy restart failed" > /dev/null
 $BIN/v-log-action "$user" "Info" "Web" "Added new web domain (Name: $domain)."
 log_event "$OK" "$ARGUMENTS"
 
-# Auto-generate Let's Encrypt SSL certificate
-if [ "$AUTO_SSL" = 'yes' ]; then
-    sleep 30  # Wait for DNS propagation
-    $BIN/v-add-letsencrypt-domain $user $domain
-    if [ $? -eq 0 ]; then
-        # Enable HTTPS redirect
-        $BIN/v-add-web-domain-ssl-force $user $domain
+if [ "$AUTO_SSL" = 'yes' ] || [ "$auto_ssl" = 'yes' ]; then
+    echo "Starting SSL certificate generation for $domain" >> /var/log/hestia/ssl-generation.log
+    
+    echo "$(date): Attempting to generate SSL certificate for $domain" >> /var/log/hestia/ssl-generation.log
+    
+    $BIN/v-add-letsencrypt-domain "$user" "$domain" 2>&1 | tee -a /var/log/hestia/ssl-generation.log
+    ssl_result=$?
+    
+    if [ $ssl_result -eq 0 ]; then
+        echo "$(date): SSL certificate generated successfully for $domain" >> /var/log/hestia/ssl-generation.log
+        $BIN/v-add-web-domain-ssl-force "$user" "$domain"
         echo "SSL certificate issued and HTTPS redirect enabled for $domain"
+    else
+        echo "$(date): SSL certificate generation failed for $domain with exit code $ssl_result" >> /var/log/hestia/ssl-generation.log
+        echo "Warning: SSL certificate generation failed for $domain"
     fi
+else
+    echo "$(date): AUTO_SSL not enabled for $domain (AUTO_SSL=$AUTO_SSL, auto_ssl=$auto_ssl)" >> /var/log/hestia/ssl-generation.log
 fi
 
 exit

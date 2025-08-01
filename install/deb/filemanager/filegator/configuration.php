@@ -205,7 +205,23 @@ $dist_config["services"]["Filegator\Services\Storage\Filesystem"]["config"][
 		}
 	}
 
+	$user_data_dir = "/usr/local/hestia/data/users/" . $v_user;
+	$user_conf_file = $user_data_dir . "/user.conf";
+	
 	$root = "/home/" . $v_user;
+	
+	if (file_exists($user_conf_file)) {
+		$user_conf = file_get_contents($user_conf_file);
+		if (preg_match('/FILE_MANAGER_ROOT=\'(.*?)\'/', $user_conf, $matches)) {
+			$custom_root = trim($matches[1], "'");
+			if (!empty($custom_root)) {
+				$custom_root = realpath($custom_root);
+				if ($custom_root !== false && (strpos($custom_root, '/home/') === 0 || $custom_root === '/home')) {
+					$root = $custom_root;
+				}
+			}
+		}
+	}
 
 	return new \League\Flysystem\Sftp\SftpAdapter([
 		"host" => "127.0.0.1",

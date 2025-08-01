@@ -35,6 +35,9 @@ rebuild_user_conf() {
 	if [ -z "${TWOFA+x}" ]; then
 		sed -i "/RKEY/a TWOFA=''" $USER_DATA/user.conf
 	fi
+	if [ -z "${FILE_MANAGER_ROOT+x}" ]; then
+		sed -i "/PREF_UI_SORT/a FILE_MANAGER_ROOT=''" $USER_DATA/user.conf
+	fi
 	if [ -z "${QRCODE+x}" ]; then
 		sed -i "/TWOFA/a QRCODE=''" $USER_DATA/user.conf
 	fi

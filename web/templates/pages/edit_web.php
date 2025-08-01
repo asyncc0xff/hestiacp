@@ -35,7 +35,11 @@
 			showAdvanced: false,
 			nginxCacheEnabled: <?= $v_nginx_cache == "yes" ? "true" : "false" ?>,
 			proxySupportEnabled: <?= !empty($v_proxy) ? "true" : "false" ?>,
-			customDocumentRootEnabled: <?= !empty($v_custom_doc_root) ? "true" : "false" ?>
+			customDocumentRootEnabled: <?= !empty($v_custom_doc_root) ? "true" : "false" ?>,
+			originalDomain: '<?= htmlentities(trim($v_domain, "'")) ?>',
+			currentDomain: '<?= htmlentities(trim($v_domain, "'")) ?>',
+			domainChanged: false,
+			newDomainSslEnabled: false
 		}"
 		id="main-form"
 		name="v_edit_web"
@@ -50,7 +54,9 @@
 			<?php show_alert_message($_SESSION); ?>
 			<div class="u-mb10">
 				<label for="v_domain" class="form-label"><?= _("Domain") ?></label>
-				<input type="text" class="form-control" name="v_domain" id="v_domain" value="<?= htmlentities(trim($v_domain, "'")) ?>" required>
+				<input type="text" class="form-control" name="v_domain" id="v_domain" value="<?= htmlentities(trim($v_domain, "'")) ?>" required
+					x-model="currentDomain"
+					@input="domainChanged = (currentDomain !== originalDomain)">
 				<input type="hidden" name="original_domain" value="<?= htmlentities(trim($v_domain, "'")) ?>">
 			</div>
 			<div class="u-mb10">
@@ -161,13 +167,19 @@
 					</div>
 				</div>
 			</div>
-			<div class="form-check u-mb10">
+			<div class="form-check u-mb10" x-show="!domainChanged">
 				<input x-model="sslEnabled" class="form-check-input" type="checkbox" name="v_ssl" id="v_ssl">
 				<label for="v_ssl">
 					<?= _("Enable SSL for this domain") ?>
 				</label>
 			</div>
-			<div x-cloak x-show="sslEnabled" class="u-pl30">
+			<div class="form-check u-mb10" x-cloak x-show="domainChanged">
+				<input x-model="newDomainSslEnabled" class="form-check-input" type="checkbox" name="v_new_domain_ssl" id="v_new_domain_ssl">
+				<label for="v_new_domain_ssl">
+					<?= _("Generate SSL certificate for new domain") ?>
+				</label>
+			</div>
+			<div x-cloak x-show="sslEnabled && !domainChanged" class="u-pl30">
 				<div class="form-check u-mb10">
 					<input x-model="letsEncryptEnabled" class="form-check-input js-toggle-lets-encrypt" type="checkbox" name="v_letsencrypt" id="v_letsencrypt">
 					<label for="v_letsencrypt">

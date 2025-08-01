@@ -184,28 +184,46 @@ exec(HESTIA_CMD . "v-list-web-stats json", $output, $return_var);
 $stats = json_decode(implode("", $output), true);
 unset($output);
 
-// Check POST request
 if (!empty($_POST["save"])) {
-	$v_domain = $_POST["v_domain"];
+	$new_domain = $_POST["v_domain"];
 	$original_domain = $_POST["original_domain"];
 	
-	// Check if domain name was changed
-	if (!empty($v_domain) && $v_domain !== $original_domain) {
-		// Check if new domain already exists
-		if (in_array($v_domain, $user_domains)) {
-			$_SESSION["error_msg"] = sprintf(_("Domain %s already exists."), htmlentities($v_domain));
+	if (!empty($new_domain) && $new_domain !== $original_domain) {
+		if (in_array($new_domain, $user_domains)) {
+			$_SESSION["error_msg"] = sprintf(_("Domain %s already exists."), htmlentities($new_domain));
 		} else {
-			// Rename domain
 			exec(HESTIA_CMD . "v-change-web-domain-name " . 
 				  quoteshellarg($user_plain) . " " . 
 				  quoteshellarg($original_domain) . " " . 
-				  quoteshellarg($v_domain) . " yes", 
+				  quoteshellarg($new_domain) . " yes", 
 				  $output, $return_var);
 			
 			if ($return_var == 0) {
 				$_SESSION["ok_msg"] = sprintf(_("Domain renamed from %s to %s successfully."), 
-					htmlentities($original_domain), htmlentities($v_domain));
-				header("Location: /edit/web/?domain=" . $v_domain);
+					htmlentities($original_domain), htmlentities($new_domain));
+				
+				if (!empty($_POST['v_new_domain_ssl'])) {
+					error_log("Generating SSL certificate for renamed domain: " . $new_domain);
+					
+					exec(HESTIA_CMD . "v-add-letsencrypt-domain " . 
+						 quoteshellarg($user_plain) . " " . 
+						 quoteshellarg($new_domain) . " 2>&1", 
+						 $ssl_output, $ssl_return_var);
+					
+					if ($ssl_return_var == 0) {
+						exec(HESTIA_CMD . "v-add-web-domain-ssl-force " . 
+							 quoteshellarg($user_plain) . " " . 
+							 quoteshellarg($new_domain));
+						
+						$_SESSION["ok_msg"] .= " " . _("SSL certificate generated and HTTPS redirect enabled.");
+						error_log("SSL certificate generated successfully for: " . $new_domain);
+					} else {
+						$_SESSION["error_msg"] = _("Domain renamed successfully, but SSL certificate generation failed: ") . implode('<br>', $ssl_output);
+						error_log("SSL certificate generation failed for: " . $new_domain . ", error: " . implode("\n", $ssl_output));
+					}
+				}
+				
+				header("Location: /list/web/");
 				exit();
 			} else {
 				$_SESSION["error_msg"] = implode('<br>', $output);
@@ -213,13 +231,11 @@ if (!empty($_POST["save"])) {
 		}
 	}
 	
-	if (!in_array($v_domain, $user_domains)) {
+	if (!in_array($v_domain, $user_domains) && $v_domain === $original_domain) {
 		check_return_code(3, ["Unknown domain"]);
 	}
-	// Check token
 	verify_csrf($_POST);
 
-	// Change web domain IP
 	$v_newip = "";
 	$v_newip_public = "";
 
